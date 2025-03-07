@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import generatePDF, { Resolution, Margin } from "react-to-pdf";
 
+
 import Swal from "sweetalert2";
 
 const options = {
@@ -27,6 +28,10 @@ const options = {
 };
 
 const Home = () => {
+
+  const downloadPDF=()=>{
+    window.print();
+  }
   const targetRef = useRef();
   const [inputFields, setInputFields] = useState([{ name: "" }]);
   const [formData, setFormData] = useState({
@@ -61,7 +66,7 @@ const Home = () => {
     const addUser = { name, uname, designation, age };
     console.log(inputFields, addUser);
 
-    fetch("http://localhost:5000/addprescription", {
+    fetch("https://doctor-prescriptions-server.vercel.app/addprescription", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -94,11 +99,11 @@ const Home = () => {
   return (
     <div ref={targetRef}>
       <div className="flex items-center justify-center bg-slate-300">
-        <img
-          src="../../public/1630629403471.jpg"
+        {/* <img
+          src='../assets/1630629403471.jpg'
           alt=""
           className="w-14 h-14 mt-6 mb-6"
-        />
+        /> */}
         <h2 className="text-6xl text-blue-500 ml-7 mt-6 mb-6">FOUR H GROUP</h2>
       </div>
       <div
@@ -110,7 +115,7 @@ const Home = () => {
             {/* Unit Name and ID */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div className="form-control">
-                <label className="block text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-medium text-blue-500 mb-2">
                   Unit Name:
                 </label>
                 <input
@@ -127,7 +132,7 @@ const Home = () => {
               </div>
 
               <div className="form-control">
-                <label className="block text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-medium text-blue-500 mb-2">
                   ID No:
                 </label>
                 <input
@@ -144,7 +149,7 @@ const Home = () => {
             {/* Name and Age */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div className="form-control">
-                <label className="block text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-medium text-blue-500 mb-2">
                   Name:
                 </label>
                 <input
@@ -161,7 +166,7 @@ const Home = () => {
               </div>
 
               <div className="form-control">
-                <label className="block text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-medium text-blue-500 mb-2">
                   Age:
                 </label>
                 <input
@@ -180,7 +185,7 @@ const Home = () => {
 
             {/* Designation */}
             <div className="form-control mb-6">
-              <label className="block text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-lg font-medium text-blue-500 mb-2">
                 Designation:
               </label>
               <input
