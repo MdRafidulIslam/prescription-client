@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import generatePDF, { Resolution, Margin } from "react-to-pdf";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import Swal from "sweetalert2";
 
@@ -28,20 +29,35 @@ const options = {
 };
 
 const Home = () => {
-
-  const downloadPDF=()=>{
+  const [startDate, setStartDate] = useState(new Date());
+  const downloadPDF = () => {
     window.print();
-  }
+  };
+
+
+
+  // console.log(startDate?.toLocaleDateString());
   const targetRef = useRef();
-  const [inputFields, setInputFields] = useState([{ name: "" }]);
+  const [inputFields, setInputFields] = useState([
+    { mname: "", quantity: "", morning: false, noon: false, night: false },
+  ]);
   const [formData, setFormData] = useState({
     name: "",
     uname: "",
     designation: "",
+    employeeId: "",
+    dated: "",
     age: "",
     _id: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleChange = (index,event) => {
+    let data = [...inputFields];
+    data[index][event.target.name] = event.target.checked;
+    setInputFields(data);
+    console.log(event.target.name, event.target.checked);
+  };
 
   const handleFormChange = (index, event) => {
     let data = [...inputFields];
@@ -50,10 +66,11 @@ const Home = () => {
   };
 
   const addFields = () => {
-    let newField = { name: "" };
+    let newField = { mname: "", quantity: "",morning: false, noon: false, night: false };
+
     setInputFields([...inputFields, newField]);
   };
-
+  // console.log(startDate.toLocaleDateString("en-GB"));
   const handleSubmit = (event) => {
     event.preventDefault();
     const form = event.target;
@@ -62,8 +79,10 @@ const Home = () => {
     const uname = form.uname.value;
     const designation = form.designation.value;
     const age = form.age.value;
+    const employeeId = form.employeeId.value;
+    const dated = startDate.toLocaleDateString("en-GB");
 
-    const addUser = { name, uname, designation, age };
+    const addUser = { name, uname, designation, age, employeeId, dated };
     console.log(inputFields, addUser);
 
     fetch("https://doctor-prescriptions-server.vercel.app/addprescription", {
@@ -88,6 +107,7 @@ const Home = () => {
             uname: data.uname,
             designation: data.designation,
             age: data.age,
+            employeeId: data.employeeId,
             _id: data.insertedId,
           });
 
@@ -98,37 +118,46 @@ const Home = () => {
 
   return (
     <div ref={targetRef}>
-      <div className="flex items-center justify-center bg-slate-300">
-        {/* <img
-          src='../assets/1630629403471.jpg'
-          alt=""
-          className="w-14 h-14 mt-6 mb-6"
-        /> */}
-        <h2 className="text-6xl text-blue-500 ml-7 mt-6 mb-6">FOUR H GROUP</h2>
-      </div>
-      <div
-        className="bg-gray-100 min-h-screen py-12 px-6 flex items-center justify-center"
-       
-      >
-        <div className="max-w-4xl w-full bg-white p-8 rounded-xl shadow-lg">
+      <div className="bg-gray-100 min-h-screen py-12 px-6 flex items-center justify-center">
+        <div className="max-w-5xl w-full bg-white p-8 rounded-xl shadow-lg">
           <form onSubmit={handleSubmit}>
+            {/* date picker */}
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div className="form-control">
+                <label className="block text-lg font-medium text-blue-500 mb-2">
+                  Date :
+                </label>
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  disabled={isSubmitted}
+                />
+              </div>
+            </div>
             {/* Unit Name and ID */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div className="form-control">
                 <label className="block text-lg font-medium text-blue-500 mb-2">
                   Unit Name:
                 </label>
-                <input
-                  type="text"
+
+                <select
                   name="uname"
-                  placeholder="Enter unit name"
-                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="select select-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
                   value={formData.uname}
                   onChange={(e) =>
                     setFormData({ ...formData, uname: e.target.value })
                   }
                   disabled={isSubmitted}
-                />
+                  required
+                >
+                  <option value="">--select unit name--</option>
+                  <option value="Knitting">Knitting</option>
+                  <option value="Dying">Dying</option>
+                  <option value="Finishing">Finishing</option>
+                </select>
               </div>
 
               <div className="form-control">
@@ -162,6 +191,7 @@ const Home = () => {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   disabled={isSubmitted}
+                  required
                 />
               </div>
 
@@ -179,26 +209,53 @@ const Home = () => {
                     setFormData({ ...formData, age: e.target.value })
                   }
                   disabled={isSubmitted}
+                  required
                 />
               </div>
             </div>
 
-            {/* Designation */}
-            <div className="form-control mb-6">
-              <label className="block text-lg font-medium text-blue-500 mb-2">
-                Designation:
-              </label>
-              <input
-                type="text"
-                name="designation"
-                placeholder="Enter designation"
-                className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
-                value={formData.designation}
-                onChange={(e) =>
-                  setFormData({ ...formData, designation: e.target.value })
-                }
-                disabled={isSubmitted}
-              />
+            {/* Designation and employee id*/}
+
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div className="form-control mb-6">
+                <label className="block text-lg font-medium text-blue-500 mb-2">
+                  Designation:
+                </label>
+                <select
+                  name="designation"
+                  className="select select-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  value={formData.designation}
+                  onChange={(e) =>
+                    setFormData({ ...formData, designation: e.target.value })
+                  }
+                  disabled={isSubmitted}
+                  required
+                >
+                  <option value="">--select employee designation--</option>
+                  <option value="Executive">Executive</option>
+                  <option value="Assistent Executive">
+                    Assistent Executive
+                  </option>
+                  <option value="Officer">Officer</option>
+                </select>
+              </div>
+              <div className="form-control mb-6">
+                <label className="block text-lg font-medium text-blue-500 mb-2">
+                  Employee Id :
+                </label>
+                <input
+                  type="text"
+                  name="employeeId"
+                  placeholder="Enter employeeId"
+                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  value={formData.employeeId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, employeeId: e.target.value })
+                  }
+                  disabled={isSubmitted}
+                  required
+                />
+              </div>
             </div>
 
             <div className="divider my-8"></div>
@@ -208,17 +265,74 @@ const Home = () => {
 
             {/* Medicine Input Fields */}
             <div className="mb-8">
+              <div className="grid md:grid-cols-2 gap-1 mb-3">
+                <span></span>
+                <div className="grid md:grid-cols-4 gap-1 ">
+                  <span className="text-blue-500 text-xl font-semibold">
+                    Morning
+                  </span>
+                  <span className="text-blue-500 text-xl font-semibold">
+                    Noon
+                  </span>
+                  <span className="text-blue-500 text-xl font-semibold">
+                    Night
+                  </span>
+                  <span className="text-blue-500 text-xl font-semibold">
+                    Quantity
+                  </span>
+                </div>
+              </div>
               {inputFields.map((input, index) => {
                 return (
-                  <div key={index} className="mb-4">
+                  <div key={index} className="grid md:grid-cols-2 gap-6 mb-6">
                     <input
-                      name="name"
+                      name="mname"
                       placeholder="Enter the medicine"
-                      className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
-                      value={input.name}
+                      className="input input-bordered w-5/6 h-12 px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                      value={input.mname}
                       onChange={(event) => handleFormChange(index, event)}
                       disabled={isSubmitted}
                     />
+
+                    <div className="grid md:grid-cols-4 gap-1 mb-6 mt-2">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="morning"
+                          className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          // checked={input.morning}
+                          onChange={(event)=>handleChange(index,event)}
+                        />
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="noon"
+                          className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          // checked={input.noon}
+                          onChange={(event)=>handleChange(index,event)}
+                        />
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="night"
+                          className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          // checked={input.night}
+                          onChange={(event)=>handleChange(index,event)}
+                        />
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="number"
+                          name="quantity"
+                          className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                          value={input.quantity}
+                          onChange={(event) => handleFormChange(index, event)}
+                          disabled={isSubmitted}
+                        />
+                      </label>
+                    </div>
                   </div>
                 );
               })}

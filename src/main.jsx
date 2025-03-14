@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import Home from './component/Home.jsx';
 import Layout from './component/Layout.jsx';
+import App from './App.jsx';
 
 const router = createBrowserRouter([
   {
