@@ -1,43 +1,38 @@
 import React, { useState, useRef } from "react";
-import generatePDF, { Resolution, Margin } from "react-to-pdf";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PrescriptionPDF from "./PrescriptionPDF";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import Swal from "sweetalert2";
 
-const options = {
-  filename: "Prescription.pdf",
-  method: "save",
-  resolution: Resolution.HIGH,
-  page: {
-    margin: Margin.SMALL,
-    format: "a4",
-    orientation: "landscape",
-  },
-  canvas: {
-    mimeType: "image/jpeg",
-    qualityRatio: 1,
-  },
-  overrides: {
-    pdf: {
-      compress: true,
-    },
-    canvas: {
-      useCORS: true, // Ensure CORS is enabled
-    },
-  },
-};
+//   filename: "Prescription.pdf",
+//   method: "save",
+//   resolution: Resolution.HIGH,
+//   page: {
+//     margin: Margin.SMALL,
+//     format: "a4",
+//     orientation: "landscape",
+//   },
+//   canvas: {
+//     mimeType: "image/jpeg",
+//     qualityRatio: 1,
+//   },
+//   overrides: {
+//     pdf: {
+//       compress: true,
+//     },
+//     canvas: {
+//       useCORS: true, // Ensure CORS is enabled
+//     },
+//   },
+// };
 
 const Home = () => {
   const [startDate, setStartDate] = useState(new Date());
-  const downloadPDF = () => {
-    window.print();
-  };
-
-
 
   // console.log(startDate?.toLocaleDateString());
-  const targetRef = useRef();
+  // const targetRef = useRef();
   const [inputFields, setInputFields] = useState([
     { mname: "", quantity: "", morning: false, noon: false, night: false },
   ]);
@@ -51,8 +46,9 @@ const Home = () => {
     _id: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  const handleChange = (index, event) => {
 
-  const handleChange = (index,event) => {
     let data = [...inputFields];
     data[index][event.target.name] = event.target.checked;
     setInputFields(data);
@@ -60,13 +56,21 @@ const Home = () => {
   };
 
   const handleFormChange = (index, event) => {
+ 
     let data = [...inputFields];
     data[index][event.target.name] = event.target.value;
     setInputFields(data);
   };
+  const [users,setUsers]=useState({});
 
   const addFields = () => {
-    let newField = { mname: "", quantity: "",morning: false, noon: false, night: false };
+    let newField = {
+      mname: "",
+      quantity: "",
+      morning: false,
+      noon: false,
+      night: false,
+    };
 
     setInputFields([...inputFields, newField]);
   };
@@ -83,7 +87,8 @@ const Home = () => {
     const dated = startDate.toLocaleDateString("en-GB");
 
     const addUser = { name, uname, designation, age, employeeId, dated };
-    console.log(inputFields, addUser);
+    // console.log(inputFields, addUser);
+    setUsers(addUser);
 
     fetch("https://doctor-prescriptions-server.vercel.app/addprescription", {
       method: "POST",
@@ -94,6 +99,7 @@ const Home = () => {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log(data)
         if (data.insertedId) {
           Swal.fire({
             title: "Success!",
@@ -107,17 +113,20 @@ const Home = () => {
             uname: data.uname,
             designation: data.designation,
             age: data.age,
+            dated: data.dated,
             employeeId: data.employeeId,
             _id: data.insertedId,
           });
-
+          
           setIsSubmitted(true);
         }
       });
   };
 
+  
+
   return (
-    <div ref={targetRef}>
+    <div>
       <div className="bg-gray-100 min-h-screen py-12 px-6 flex items-center justify-center">
         <div className="max-w-5xl w-full bg-white p-8 rounded-xl shadow-lg">
           <form onSubmit={handleSubmit}>
@@ -154,9 +163,9 @@ const Home = () => {
                   required
                 >
                   <option value="">--select unit name--</option>
-                  <option value="Knitting">Knitting</option>
-                  <option value="Dying">Dying</option>
-                  <option value="Finishing">Finishing</option>
+                  <option value="Knitting section">Knitting</option>
+                  <option value="Dying section">Dying</option>
+                  <option value="Finishing section">Finishing</option>
                 </select>
               </div>
 
@@ -292,6 +301,7 @@ const Home = () => {
                       value={input.mname}
                       onChange={(event) => handleFormChange(index, event)}
                       disabled={isSubmitted}
+                      required
                     />
 
                     <div className="grid md:grid-cols-4 gap-1 mb-6 mt-2">
@@ -301,7 +311,8 @@ const Home = () => {
                           name="morning"
                           className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                           // checked={input.morning}
-                          onChange={(event)=>handleChange(index,event)}
+                          onChange={(event) => handleChange(index, event)}
+                          disabled={isSubmitted}
                         />
                       </label>
                       <label className="flex items-center space-x-2 cursor-pointer">
@@ -310,7 +321,8 @@ const Home = () => {
                           name="noon"
                           className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                           // checked={input.noon}
-                          onChange={(event)=>handleChange(index,event)}
+                          onChange={(event) => handleChange(index, event)}
+                          disabled={isSubmitted}
                         />
                       </label>
                       <label className="flex items-center space-x-2 cursor-pointer">
@@ -319,7 +331,8 @@ const Home = () => {
                           name="night"
                           className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                           // checked={input.night}
-                          onChange={(event)=>handleChange(index,event)}
+                          onChange={(event) => handleChange(index, event)}
+                          disabled={isSubmitted}
                         />
                       </label>
                       <label className="flex items-center space-x-2 cursor-pointer">
@@ -330,6 +343,7 @@ const Home = () => {
                           value={input.quantity}
                           onChange={(event) => handleFormChange(index, event)}
                           disabled={isSubmitted}
+                          required
                         />
                       </label>
                     </div>
@@ -352,12 +366,34 @@ const Home = () => {
                 value="Add Prescription"
                 className="btn bg-green-300 text-black px-6 py-3 rounded-md shadow-md"
               />
-              <input
-                type="button"
-                onClick={() => generatePDF(targetRef, options)}
-                value="Print Prescription"
-                className="btn bg-red-300 text-black px-6 py-3 rounded-md shadow-md"
-              />
+              <PDFDownloadLink
+                document={
+                  <PrescriptionPDF
+                    users={users}
+                    inputFields={inputFields}
+                  />
+                }
+                fileName="prescription.pdf"
+              >
+                {({ loading }) =>
+                  loading ? (
+                    <button
+                      type="button"
+                      value="Print Prescription"
+                      className="btn bg-red-300 text-black px-6 py-3 rounded-md shadow-md"
+                    >
+                      Loading PDF...
+                    </button>
+                  ) : (
+                    <input
+                      type="button"
+                      value="Print Prescription"
+                      className="btn bg-red-300 text-black px-6 py-3 rounded-md shadow-md"
+                    />
+                  )
+                }
+              </PDFDownloadLink>
+          
             </div>
           </form>
         </div>
