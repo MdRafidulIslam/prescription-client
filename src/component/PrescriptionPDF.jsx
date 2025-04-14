@@ -6,15 +6,12 @@ import {
   View,
   StyleSheet,
   Image,
- 
 } from "@react-pdf/renderer";
 import { Buffer } from "buffer";
 
 if (typeof window !== "undefined") {
   window.Buffer = Buffer;
 }
-
-
 
 // Define styles
 const styles = StyleSheet.create({
@@ -29,7 +26,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3B82F6",
   },
   header: {
-    backgroundColor: "#cbd5e1",
+    backgroundColor: "#e2e8f0",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -48,9 +45,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   leftSection: {
-    width: 180,
+    width: 200,
     height: 620,
-    backgroundColor: "#cbd5e1",
+    backgroundColor: "#e2e8f0",
   },
   rightSection: {
     flex: 1,
@@ -64,7 +61,7 @@ const styles = StyleSheet.create({
     transform: "translate(-50%, -50%)", // Center the image
     width: 340, // Adjust width as needed
     height: 360, // Adjust height as needed
-    opacity: 0.2, // Adjust transparency
+    opacity: 0.1, // Adjust transparency
   },
   footerText: {
     position: "absolute",
@@ -77,12 +74,23 @@ const styles = StyleSheet.create({
   },
   content: {
     zIndex: 1, // Ensures text appears on top of background
-    marginLeft: 40,
+
+    marginTop: 40,
+  },
+  contentLeft: {
+    zIndex: 1, // Ensures text appears on top of background
+    marginLeft: 25,
     marginTop: 40,
   },
 });
 
-const PrescriptionPDF = ({ users, inputFields }) => (
+const PrescriptionPDF = ({
+  users,
+  inputFields,
+  inputFields1,
+  inputFields2,
+  inputFields3,
+}) => (
   <Document>
     <Page>
       {/* Header */}
@@ -139,7 +147,37 @@ const PrescriptionPDF = ({ users, inputFields }) => (
       {/* Content Section */}
       <View style={styles.container}>
         {/* Left Section */}
-        <View style={styles.leftSection} />
+        <View style={styles.leftSection}>
+          <View style={styles.contentLeft}>
+            <Text style={{ marginBottom: 10 }}>Symptoms :</Text>
+            {inputFields1.map((input, index) => (
+              <Text key={index} style={{ marginBottom: 12 }}>
+                <Text>
+                  {input.symptoms ? index + 1 : " "}. {input.symptoms}
+                </Text>{" "}
+                {"\n"}
+              </Text>
+            ))}
+            <Text style={{ marginBottom: 10 }}>Ex :</Text>
+            {inputFields2.map((input, index) => (
+              <Text key={index} style={{ marginBottom: 12 }}>
+                <Text>
+                  {input.experiment?index + 1:" "}. {input.experiment}
+                </Text>{" "}
+                {"\n"}
+              </Text>
+            ))}
+            <Text style={{ marginBottom: 10 }}>Test :</Text>
+            {inputFields3.map((input, index) => (
+              <Text key={index} style={{ marginBottom: 12 }}>
+                <Text>
+                  {input.test?index + 1:" "}. {input.test}
+                </Text>{" "}
+                {"\n"}
+              </Text>
+            ))}
+          </View>
+        </View>
 
         {/* Vertical Line */}
         <View style={styles.verticalLine} />
@@ -154,22 +192,30 @@ const PrescriptionPDF = ({ users, inputFields }) => (
 
           {/* Medicine List */}
           <View style={styles.content}>
+            <Text style={{ fontSize: 15, marginBottom: 15, marginLeft: 40 }}>
+              Rx :
+            </Text>
             {inputFields.map((input, index) => (
-              <Text key={index} style={{ marginBottom: 12 }}>
+              <Text key={index} style={{ marginBottom: 12, marginLeft: 40 }}>
                 <Text>
                   {index + 1}. {input.mname}
                 </Text>{" "}
                 {"\n"}
                 <Text>
+                  <Text style={{ width: 200 }}> </Text>{" "}
+                  <Text style={{ width: 200 }}> </Text>{" "}
+                  <Text style={{ width: 200 }}> </Text>{" "}
                   {input.morning ? "1" : "0"} + {input.noon ? "1" : "0"} +{" "}
-                  {input.night ? "1" : "0"} - {input.quantity} times
+                  {input.night ? "1" : "0"} - {input.quantity}
                 </Text>
               </Text>
             ))}
           </View>
           {/* Footer Text */}
-         
-          <Text style={styles.footerText}>Bring the prescription with you to {"\n"} your next appointment</Text>
+
+          <Text style={styles.footerText}>
+            Bring the prescription with you to {"\n"} your next appointment
+          </Text>
         </View>
       </View>
     </Page>

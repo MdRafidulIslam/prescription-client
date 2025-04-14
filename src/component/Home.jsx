@@ -6,28 +6,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import Swal from "sweetalert2";
 
-//   filename: "Prescription.pdf",
-//   method: "save",
-//   resolution: Resolution.HIGH,
-//   page: {
-//     margin: Margin.SMALL,
-//     format: "a4",
-//     orientation: "landscape",
-//   },
-//   canvas: {
-//     mimeType: "image/jpeg",
-//     qualityRatio: 1,
-//   },
-//   overrides: {
-//     pdf: {
-//       compress: true,
-//     },
-//     canvas: {
-//       useCORS: true, // Ensure CORS is enabled
-//     },
-//   },
-// };
-
 const Home = () => {
   const [startDate, setStartDate] = useState(new Date());
 
@@ -36,6 +14,9 @@ const Home = () => {
   const [inputFields, setInputFields] = useState([
     { mname: "", quantity: "", morning: false, noon: false, night: false },
   ]);
+  const [inputFields1, setInputFields1] = useState([{ symptoms: "" }]);
+  const [inputFields2, setInputFields2] = useState([{ experiment: "" }]);
+  const [inputFields3, setInputFields3] = useState([{ test: "" }]);
   const [formData, setFormData] = useState({
     name: "",
     uname: "",
@@ -46,9 +27,8 @@ const Home = () => {
     _id: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
-  
-  const handleChange = (index, event) => {
 
+  const handleChange = (index, event) => {
     let data = [...inputFields];
     data[index][event.target.name] = event.target.checked;
     setInputFields(data);
@@ -56,12 +36,26 @@ const Home = () => {
   };
 
   const handleFormChange = (index, event) => {
- 
     let data = [...inputFields];
     data[index][event.target.name] = event.target.value;
     setInputFields(data);
   };
-  const [users,setUsers]=useState({});
+  const handleFormChange1 = (index, event) => {
+    let data = [...inputFields1];
+    data[index][event.target.name] = event.target.value;
+    setInputFields1(data);
+  };
+  const handleFormChange2 = (index, event) => {
+    let data = [...inputFields2];
+    data[index][event.target.name] = event.target.value;
+    setInputFields2(data);
+  };
+  const handleFormChange3 = (index, event) => {
+    let data = [...inputFields3];
+    data[index][event.target.name] = event.target.value;
+    setInputFields3(data);
+  };
+  const [users, setUsers] = useState({});
 
   const addFields = () => {
     let newField = {
@@ -73,6 +67,27 @@ const Home = () => {
     };
 
     setInputFields([...inputFields, newField]);
+  };
+  const addFields1 = () => {
+    let newField1 = {
+      symptoms: "",
+    };
+
+    setInputFields1([...inputFields1, newField1]);
+  };
+  const addFields2 = () => {
+    let newField2 = {
+      experiment: "",
+    };
+
+    setInputFields2([...inputFields2, newField2]);
+  };
+  const addFields3 = () => {
+    let newField3 = {
+      test: "",
+    };
+
+    setInputFields3([...inputFields3, newField3]);
   };
   // console.log(startDate.toLocaleDateString("en-GB"));
   const handleSubmit = (event) => {
@@ -95,11 +110,17 @@ const Home = () => {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ addUser, inputFields }),
+      body: JSON.stringify({
+        addUser,
+        inputFields,
+        inputFields1,
+        inputFields2,
+        inputFields3,
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
+        console.log(data);
         if (data.insertedId) {
           Swal.fire({
             title: "Success!",
@@ -117,13 +138,11 @@ const Home = () => {
             employeeId: data.employeeId,
             _id: data.insertedId,
           });
-          
+
           setIsSubmitted(true);
         }
       });
   };
-
-  
 
   return (
     <div>
@@ -140,7 +159,7 @@ const Home = () => {
                   selected={startDate}
                   onChange={(date) => setStartDate(date)}
                   dateFormat="dd/MM/yyyy"
-                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                   disabled={isSubmitted}
                 />
               </div>
@@ -154,7 +173,7 @@ const Home = () => {
 
                 <select
                   name="uname"
-                  className="select select-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="select select-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                   value={formData.uname}
                   onChange={(e) =>
                     setFormData({ ...formData, uname: e.target.value })
@@ -163,9 +182,9 @@ const Home = () => {
                   required
                 >
                   <option value="">--select unit name--</option>
-                  <option value="Knitting section">Knitting</option>
-                  <option value="Dying section">Dying</option>
-                  <option value="Finishing section">Finishing</option>
+                  <option value="Four H Dying and Printing Ltd.">Four H Dyeing and Printing Ltd.</option>
+                  <option value=" Four H Fashions Ltd. (Head Office)"> Four H Fashions Ltd. (Head Office)</option>
+                  <option value="Four H Apparels Ltd.">Four H Apparels Ltd.</option>
                 </select>
               </div>
 
@@ -177,7 +196,7 @@ const Home = () => {
                   type="text"
                   name="id"
                   placeholder="Generated ID No"
-                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                   value={formData._id || ""}
                   disabled
                 />
@@ -194,7 +213,7 @@ const Home = () => {
                   type="text"
                   name="patientname"
                   placeholder="Enter name"
-                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -212,7 +231,7 @@ const Home = () => {
                   type="number"
                   name="age"
                   placeholder="Enter age"
-                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                   value={formData.age}
                   onChange={(e) =>
                     setFormData({ ...formData, age: e.target.value })
@@ -232,7 +251,7 @@ const Home = () => {
                 </label>
                 <select
                   name="designation"
-                  className="select select-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="select select-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                   value={formData.designation}
                   onChange={(e) =>
                     setFormData({ ...formData, designation: e.target.value })
@@ -256,7 +275,7 @@ const Home = () => {
                   type="text"
                   name="employeeId"
                   placeholder="Enter employeeId"
-                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                  className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                   value={formData.employeeId}
                   onChange={(e) =>
                     setFormData({ ...formData, employeeId: e.target.value })
@@ -267,16 +286,112 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="divider my-8"></div>
+            <div className="divider my-12"></div>
+
+            <h2 className="text-center text-3xl text-blue-500 mb-8">
+              Please Fill The Symptoms,test and experiment Field...
+            </h2>
+
+            {/* symptons,test and experiment field */}
+            <div className="mb-8">
+              <div className="grid md:grid-cols-3 gap-2 mb-3">
+                <span className="text-blue-500 text-xl font-semibold ml-6">
+                  CC/Symptoms
+                </span>
+                <span className="text-blue-500 text-xl font-semibold ml-2">
+                  Ex
+                </span>
+                <span className="text-blue-500 text-xl font-semibold ml-6">
+                  Test/Diagnostic
+                </span>
+              </div>
+              <div className="grid md:grid-cols-3 gap-2 mb-6">
+                <div>
+                  {inputFields1.map((input, index) => {
+                    return (
+                      <div key={index} className="mb-6">
+                        <input
+                          name="symptoms"
+                          placeholder="Enter the symptoms"
+                          className="input input-bordered w-5/6 h-12 px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
+                          value={input.symptoms}
+                          onChange={(event) => handleFormChange1(index, event)}
+                          disabled={isSubmitted}
+                        />
+                      </div>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={addFields1}
+                    disabled={isSubmitted}
+                    className="btn  bg-red-300 text-black px-5 py-2 rounded-md mt-4"
+                  >
+                    Add More symptoms
+                  </button>
+                </div>
+                <div>
+                  {inputFields2.map((input, index) => {
+                    return (
+                      <div key={index} className="mb-6">
+                        <input
+                          name="experiment"
+                          placeholder="Enter the experiment"
+                          className="input input-bordered w-5/6 h-12 px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
+                          value={input.experiment}
+                          onChange={(event) => handleFormChange2(index, event)}
+                          disabled={isSubmitted}
+                        />
+                      </div>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={addFields2}
+                    disabled={isSubmitted}
+                    className="btn  bg-red-300 text-black px-5 py-2 rounded-md mt-4"
+                  >
+                    Add More experiment
+                  </button>
+                </div>
+                <div>
+                  {inputFields3.map((input, index) => {
+                    return (
+                      <div key={index} className="mb-6">
+                        <input
+                          name="test"
+                          placeholder="Enter the test"
+                          className="input input-bordered w-5/6 h-12 px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
+                          value={input.experiment}
+                          onChange={(event) => handleFormChange3(index, event)}
+                          disabled={isSubmitted}
+                     
+                        />
+                      </div>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={addFields3}
+                    disabled={isSubmitted}
+                    className="btn  bg-red-300 text-black px-5 py-2 rounded-md mt-4"
+                  >
+                    Add More test
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="divider my-12"></div>
             <h2 className="text-center text-3xl text-blue-500 mb-8">
               Please Fill The Medicine Field...
             </h2>
 
             {/* Medicine Input Fields */}
             <div className="mb-8">
-              <div className="grid md:grid-cols-2 gap-1 mb-3">
+              <div className="grid md:grid-cols-3 gap-1 mb-3">
                 <span></span>
-                <div className="grid md:grid-cols-4 gap-1 ">
+                <div className="grid md:grid-cols-3 gap-1 ">
                   <span className="text-blue-500 text-xl font-semibold">
                     Morning
                   </span>
@@ -286,25 +401,25 @@ const Home = () => {
                   <span className="text-blue-500 text-xl font-semibold">
                     Night
                   </span>
-                  <span className="text-blue-500 text-xl font-semibold">
-                    Quantity
-                  </span>
                 </div>
+                <span className="text-blue-500 text-xl font-semibold ml-6">
+                  days/times
+                </span>
               </div>
               {inputFields.map((input, index) => {
                 return (
-                  <div key={index} className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div key={index} className="grid md:grid-cols-3 gap-6 mb-6">
                     <input
                       name="mname"
                       placeholder="Enter the medicine"
-                      className="input input-bordered w-5/6 h-12 px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                      className="input input-bordered w-5/6 h-12 px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                       value={input.mname}
                       onChange={(event) => handleFormChange(index, event)}
                       disabled={isSubmitted}
                       required
                     />
 
-                    <div className="grid md:grid-cols-4 gap-1 mb-6 mt-2">
+                    <div className="grid md:grid-cols-3 gap-1 mb-6 mt-2">
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -335,11 +450,13 @@ const Home = () => {
                           disabled={isSubmitted}
                         />
                       </label>
+                    </div>
+                    <div>
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
-                          type="number"
+                          type="text"
                           name="quantity"
-                          className="input input-bordered w-full px-4 py-2 text-lg rounded-md border-gray-300 shadow-sm"
+                          className="input input-bordered w-5/6 px-4 py-2 text-lg rounded-md border-gray-300 shadow-md"
                           value={input.quantity}
                           onChange={(event) => handleFormChange(index, event)}
                           disabled={isSubmitted}
@@ -354,7 +471,7 @@ const Home = () => {
                 type="button"
                 onClick={addFields}
                 disabled={isSubmitted}
-                className="btn  bg-red-300 text-black px-6 py-3 rounded-md mt-4"
+                className="btn  bg-red-300 text-black px-5 py-2 rounded-md mt-4"
               >
                 Add More Medicine
               </button>
@@ -365,22 +482,27 @@ const Home = () => {
                 type="submit"
                 value="Add Prescription"
                 className="btn bg-green-300 text-black px-6 py-3 rounded-md shadow-md"
+                disabled={isSubmitted}
               />
               <PDFDownloadLink
                 document={
                   <PrescriptionPDF
                     users={users}
                     inputFields={inputFields}
+                    inputFields1={inputFields1}
+                    inputFields2={inputFields2}
+                    inputFields3={inputFields3}
                   />
                 }
                 fileName="prescription.pdf"
               >
-                {({ loading }) =>
+                {/* {({ loading }) =>
                   loading ? (
                     <button
                       type="button"
                       value="Print Prescription"
                       className="btn bg-red-300 text-black px-6 py-3 rounded-md shadow-md"
+                      disabled={!isSubmitted}
                     >
                       Loading PDF...
                     </button>
@@ -389,11 +511,17 @@ const Home = () => {
                       type="button"
                       value="Print Prescription"
                       className="btn bg-red-300 text-black px-6 py-3 rounded-md shadow-md"
+                      disabled={!isSubmitted}
                     />
                   )
-                }
+                } */}
+                   <input
+                      type="button"
+                      value="Print Prescription"
+                      className="btn bg-red-300 text-black px-6 py-3 rounded-md shadow-md"
+                      disabled={!isSubmitted}
+                    />
               </PDFDownloadLink>
-          
             </div>
           </form>
         </div>
